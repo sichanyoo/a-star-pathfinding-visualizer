@@ -65,8 +65,10 @@ def main(win, width):
 
     # app while loop variable
     run = True
-    # variables used to prevent user from starting A* pathfinding algorithm without resetting the window
-    started = False
+    # variable for tracking if algorithm has been initiated or not
+    running = False
+    # variable for tracking if algorithm has been run AND finished
+    finished = False
 
     while run:
         # draw over the whole grid
@@ -78,11 +80,11 @@ def main(win, width):
                 run = False
 
             # if algorithm is started and on-going, skip over to next iteration of for loop
-            if started:
+            if running:
                 continue
 
             # if left mouse button is clicked AND algorithm is not running:
-            if pygame.mouse.get_pressed(num_buttons=3)[0]:
+            if not finished and pygame.mouse.get_pressed(num_buttons=3)[0]:
                 # get the clicked node
                 pos = pygame.mouse.get_pos()
                 row, col = get_clicked_pos(pos, rows, width)
@@ -101,7 +103,7 @@ def main(win, width):
                     curr.make_barrier()
 
             # if right mouse button is clicked AND algorithm is not running:
-            elif pygame.mouse.get_pressed(num_buttons=3)[2]:
+            elif not finished and pygame.mouse.get_pressed(num_buttons=3)[2]:
                 # get the clicked node, then make it white
                 pos = pygame.mouse.get_pos()
                 row, col = get_clicked_pos(pos, rows, width)
@@ -117,22 +119,25 @@ def main(win, width):
             # if a key on keyboard was pressed
             if event.type == pygame.KEYDOWN:
                 # if it was space bar AND start/end nodes have been set AND algorithm hasn't been run since last reset
-                if event.key == pygame.K_SPACE and start and end and not started:
+                if event.key == pygame.K_SPACE and start and end and not running:
                     # for all nodes on grid, update their neighbors
                     for row in grid:
                         for current in row:
                             current.update_neighbors(grid)
                     # set these to true so user can't restart algorithm before resetting the pygame window first
-                    started = True
+                    running = True
                     # show A* pathfinding algorithm
                     pathfindingAlgo.a_star_algorithm(lambda: viewHelperMethods.draw(win, grid, rows, width),
                                                      grid, start, end)
+                    running = False
+                    finished = True
 
                 # if it was 'c' key, then reset the pygame window, and all other variables accordingly
                 if event.key == pygame.K_c:
                     start = None
                     end = None
-                    started = False
+                    running = False
+                    finished = False
                     # remake grid to reset it
                     grid = make_grid(rows, width)
 
