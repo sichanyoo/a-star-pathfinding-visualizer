@@ -67,7 +67,6 @@ def main(win, width):
     run = True
     # variables used to prevent user from starting A* pathfinding algorithm without resetting the window
     started = False
-    finished = False
 
     while run:
         # draw over the whole grid
@@ -79,40 +78,40 @@ def main(win, width):
                 run = False
 
             # if algorithm is started and on-going, skip over to next iteration of for loop
-            if started and not finished:
+            if started:
                 continue
 
-            # if left mouse button is clicked:
+            # if left mouse button is clicked AND algorithm is not running:
             if pygame.mouse.get_pressed(num_buttons=3)[0]:
                 # get the clicked node
                 pos = pygame.mouse.get_pos()
                 row, col = get_clicked_pos(pos, rows, width)
-                node = grid[row][col]
+                curr = grid[row][col]
 
                 # if start node hasn't been placed AND clicked node isn't the end node, make it start node
-                if not start and node != end:
-                    start = node
+                if not start and curr != end:
+                    start = curr
                     start.make_start()
                 # if end node hasn't been placed AND clicked node isn't the start node, make it end node
-                elif not end and node != start:
-                    end = node
+                elif not end and curr != start:
+                    end = curr
                     end.make_end()
                 # in neither case, make the node a barrier
-                elif node != end and node != start:
-                    node.make_barrier()
+                elif curr != end and curr != start:
+                    curr.make_barrier()
 
-            # if right mouse button is clicked:
+            # if right mouse button is clicked AND algorithm is not running:
             elif pygame.mouse.get_pressed(num_buttons=3)[2]:
                 # get the clicked node, then make it white
                 pos = pygame.mouse.get_pos()
                 row, col = get_clicked_pos(pos, rows, width)
-                node = grid[row][col]
-                node.reset()
+                curr = grid[row][col]
+                curr.reset()
 
                 # then, if the clicked node was start/end, reset start/end variables
-                if node == start:
+                if curr == start:
                     start = None
-                if node == end:
+                if curr == end:
                     end = None
 
             # if a key on keyboard was pressed
@@ -121,19 +120,18 @@ def main(win, width):
                 if event.key == pygame.K_SPACE and start and end and not started:
                     # for all nodes on grid, update their neighbors
                     for row in grid:
-                        for node in row:
-                            node.update_neighbors(grid)
+                        for current in row:
+                            current.update_neighbors(grid)
                     # set these to true so user can't restart algorithm before resetting the pygame window first
                     started = True
-                    finished = True
                     # show A* pathfinding algorithm
-                    pathfindingAlgo.a_star_algorithm(lambda: viewHelperMethods.draw(win, grid, rows, width), grid, start, end)
+                    pathfindingAlgo.a_star_algorithm(lambda: viewHelperMethods.draw(win, grid, rows, width),
+                                                     grid, start, end)
 
                 # if it was 'c' key, then reset the pygame window, and all other variables accordingly
                 if event.key == pygame.K_c:
                     start = None
                     end = None
-                    finished = False
                     started = False
                     # remake grid to reset it
                     grid = make_grid(rows, width)

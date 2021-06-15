@@ -10,9 +10,9 @@ def draw_gridlines(win, rows, width):
     gap = width // rows
     for i in range(rows):
         # horizontal lines
-        pygame.draw.line(win, constants.GRIDLINE, (0, i * gap), (width, i * gap))
+        pygame.draw.line(win, constants.GRID_LINE, (0, i * gap), (width, i * gap))
         # vertical lines
-        pygame.draw.line(win, constants.GRIDLINE, (i * gap, 0), (i * gap, width))
+        pygame.draw.line(win, constants.GRID_LINE, (i * gap, 0), (i * gap, width))
 
 
 # draw the pygame window
@@ -32,7 +32,7 @@ def draw(win, grid, rows, width):
 
 
 # color the path
-def reconstruct_path(came_from, current, draw):
+def reconstruct_path(came_from, current, draw_lambda):
     # this while loop stops eventually since came_from of start node is none and won't be in came_from anymore
     while current in came_from:
         # get the last node of current
@@ -40,4 +40,4 @@ def reconstruct_path(came_from, current, draw):
         # color it as path
         current.make_path()
         # update window
-        draw()
+        draw_lambda()
